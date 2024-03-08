@@ -1,0 +1,50 @@
+Protocol: RegistrationAndPayment
+# This version leaks the ticket price
+Types:
+    Agent A, S, mitID, b;
+    Number NA, NS, TicketPaymentInfo, Ticket, CardInfoA, AuthToken, PaymentReceipt,ConfirmPayment,TicketPrice;
+    Symmetric_key KAS;
+    Function sk, pk, creditCardInfo, pre
+
+Knowledge: 
+    A: A, S, sk(A, mitID), mitID, b, inv(creditCardInfo(A)),creditCardInfo(A), pre;
+    S: A, S,b, sk(S, mitID), mitID, pk(S), inv(pk(S)),pk(b),pre;
+    mitID: A, S, sk(A, mitID), sk(S, mitID);
+    b: A, b, S, creditCardInfo, pk(b), inv(pk(b)), pk(S), inv(creditCardInfo(A)),pre
+    where A!=S
+
+# Share a symmetric key between the app and server via the help of mitID
+# as the identity provider. Assume that A!=S, which means that we require 
+# some way to ensure that the symmetric key is different per device for
+# our participants
+Actions:
+#Registration
+    S->A: A, S, NS
+    A->mitID: A, S, NA, NS
+    mitID->A: {|KAS, A, S, NS|}sk(S, mitID), 
+              {|KAS, A, S, NA|}sk(A, mitID)
+    A->S: {|KAS, A, S, NS|}sk(S, mitID), A, S
+    S->A: {|KAS, A, S, AuthToken|}KAS, A, S
+#Payment
+    # Payment to buy ticket supplied in th ticketpaymentinfo
+    A->S: {|TicketPaymentInfo, {CardInfoA,A,TicketPrice}inv(creditCardInfo(A))|}KAS, A, S
+    # Server requests payment authorization from bank, A is sent in the signed message and in the message too, so the bank can be sure S isnt sending cards randomly
+    S->b: {S, b, A, {CardInfoA,A,TicketPrice}inv(creditCardInfo(A))}pk(b)
+
+    # Bank confirms payment, by sending back the nonce with a pre
+    b->S: {S,b,A,pre(PaymentReceipt),ConfirmPayment}pk(S)
+
+    # Server now sends the ticket to the user's application
+    S->A: {|A, S, Ticket, ConfirmPayment|}KAS
+Goals:
+    A authenticates mitID on KAS,S
+    S authenticates mitID on KAS,A
+
+    KAS secret between A,S,mitID
+    AuthToken secret between A,S
+    TicketPaymentInfo secret between A,S
+    CardInfoA secret between A,b
+    TicketPrice secret between A,b
+    Ticket secret between S,A
+
+    
