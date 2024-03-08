@@ -1,0 +1,30 @@
+Protocol: ScanTicket
+
+Types:
+    Agent A,v,S;
+    Number X, XX, Y, YY, g;
+    Function pk, sk, ticket, ticketValidity
+
+Knowledge:
+    A: A, v, S, ticket(A), pk(A), inv(pk(A)), pk(v), g;
+    v: A, v, S, pk(v), inv(pk(v)), pk(S), pk(A), g;
+    S: v, S, pk(S), inv(pk(S)), pk(v), ticketValidity, g
+
+Actions:
+    A->v: {A, v, exp(g, X)}inv(pk(A))
+    v->A: {A, v, exp(g, Y)}inv(pk(v))
+    A->v: {|A, v, ticket(A)|}exp(exp(g, X), Y)
+    v->S: {v, S, exp(g, XX)}inv(pk(v))
+    S->v: {v, S, exp(g, YY)}inv(pk(S))
+    v->S: {|v, S, ticket(A)|}exp(exp(g, XX), YY)
+    S->v: {|v, S, ticketValidity(ticket(A))|}exp(exp(g, XX), YY)
+    #v->A: {|A, v, ticketValidity(ticket(A))|}exp(exp(g, X), Y)
+
+Goals:
+    #V weakly authenticates A on NA #Works for weak auth
+    #V authenticates S on NA,NV,NS #Works for strong auth
+    #S weakly authenticates V on NA,NV #Works for weak auth
+
+
+    ticket(A) secret between A,v,S
+    #ticketValidity(ticket(A)) secret between V,S

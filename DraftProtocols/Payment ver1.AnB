@@ -1,0 +1,34 @@
+Protocol: Payment
+
+Types:
+    Agent A, S, B;
+    Number NS, NB, CreditCardInfo, TicketPaymentInfo, Ticket, Movie, PaymentResult, UserToken;
+    Function pk
+
+Knowledge:
+    A: A, S;
+    S: S, A, B, pk(S), inv(pk(S)), pk(B);
+    B: B, S, pk(B), inv(pk(B)), pk(S)
+
+# Assume we've already registered with the Registration protocol, we use
+# the same UserToken and TLS here to gurantee the authenticity and confidentiality
+# between the app and server
+# Otherwise use asymmetric key exchange between the bank and the server to
+# do the payment 
+Actions:
+    A*->*S: A, S, UserToken, Movie, CreditCardInfo
+    S->B: S, B, NS
+    B->S: S, B, NS, NB                                                      
+    S->B: {{B, CreditCardInfo, TicketPaymentInfo, NS, NB}inv(pk(S))}pk(B)   
+    B->S: {{PaymentResult, S, NS, NB}inv(pk(B))}pk(S)                       
+    S*->*A: A, Ticket
+
+Goals:
+A authenticates S on Ticket
+S authenticates A on UserToken
+S authenticates B on CreditCardInfo, TicketPaymentInfo
+B authenticates S on PaymentResult
+
+CreditCardInfo secret between A,B,S
+TicketPaymentInfo secret between S,B
+PaymentResult secret between S,B

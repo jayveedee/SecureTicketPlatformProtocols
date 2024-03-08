@@ -1,0 +1,22 @@
+Protocol: ServerBankKeyExchange
+
+Types:
+    Agent s, b;
+    Number Msg, NS, NB;
+    Function pk
+
+Knowledge:
+    s: s, b, pk(s), inv(pk(s)), pk(b);
+    b: b, s, pk(b), inv(pk(b)), pk(s)
+
+Actions:
+    s->b: s, b, NS
+    b->s: s, b, Ns, NB
+    s->b: {{b, Msg, NS, NB}inv(pk(s))}pk(b)
+    b->s: {{Msg, s, NS, NB}inv(pk(b))}pk(s)
+
+Goals:
+s authenticates b on Msg
+b authenticates s on Msg
+
+Msg secret between s,b

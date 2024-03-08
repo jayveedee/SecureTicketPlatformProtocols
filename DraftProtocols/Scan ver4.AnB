@@ -1,0 +1,36 @@
+Protocol: scanTicket
+
+Types:
+    Agent A, V, S;  
+    Number TicketID, N2, N1, TicketValidity,Nonce;
+    Function pk,sk; 
+
+    # A is for App, V is for venue and S is for Server
+
+    #ssuming we have the App, the Venue, & the Server, the communication would probably be something like this
+    #The venue employee comes over to scan your QR code
+
+
+Knowledge:
+    A: A, V, S, pk;
+    V: A, V, S, pk, inv(pk(V)), sk(V,S);
+    S: A, V, S, pk, inv(pk(S)), sk(V,S);
+
+Actions:
+    A -> V: { A, V, TicketID }pk(V)
+    V -> S: { TicketID,  {| A, TicketID |}sk(V,S) }pk(S)
+    S -> V: { {|{ V, N1, TicketValidity }inv(pk(S))|}sk(V,S) }pk(V)
+    
+
+Goals:
+    
+    S authenticates V on TicketValidity
+    
+
+
+    
+    
+   
+
+  
+   

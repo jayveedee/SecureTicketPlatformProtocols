@@ -1,0 +1,22 @@
+Protocol: AppServerKeyExchange
+
+Types:
+    Agent a, s;
+    Number NA, NS, g, MsgA, MsgS;
+
+Knowledge:
+    a: a, s, g;
+    s: s, a, g
+
+Actions:
+    a -> s: a, s, exp(g, NA)
+    s -> a: a, s, exp(g, NS)
+    a -> s: {|a, s, MsgA|}exp(exp(g, NA), NS)
+    s -> a: {|s, a, MsgS|}exp(exp(g, NA), NS)
+
+Goals:
+    a authenticates s on exp(exp(g, NA), NS),MsgS
+    s authenticates a on exp(exp(g, NA), NS),MsgA
+    exp(exp(g, NA), NS) secret between a,s
+    MsgA secret between a,s
+    MsgS secret between a,s

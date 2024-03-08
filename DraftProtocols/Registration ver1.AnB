@@ -1,0 +1,26 @@
+Protocol: Registration
+
+Types:
+    Agent A, S, idp;
+    Number URI, UserToken, ID, NA;
+
+Knowledge:
+    A: A, S, idp, pk(idp);
+    S: A, S, idp, pk(idp);
+    idp: A, S, idp, pk(idp), inv(pk(idp))
+
+# Assumption is we use a TLS channel here that only gurantees confidentiality 
+# from the server and the client is unknown, therefore we register via SSO
+Actions: 
+    [A]*->*S: A, S, URI
+    S*->*[A]: A, S, URI, idp
+    A*->*idp: A, S, URI, idp
+    idp*->*A: {ID, A, idp, S}inv(pk(idp)), URI
+    [A]*->*S: {ID, A, idp, S}inv(pk(idp)), URI
+    S*->*[A]: UserToken
+
+Goals:
+    A authenticates S on UserToken
+    S authenticates A on URI
+
+    UserToken secret between A, S
