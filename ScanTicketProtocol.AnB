@@ -12,7 +12,7 @@ Knowledge:
 
 # The protocol will scan the ticket from the app via some qrscanner, which only the venue knows (as this is most likely done by camera)
 # however we still want to authenticate that the A is who he says he is and the reverse. Therefore we send a challenge before we start doing anything.
-# Afterwards the venue request for the ticket and scans it. The venue then tries to get a hold of the server, by sending a challenge again
+# Afterwards the venue request for the ticket and scans it. The venue then tries to get ahold of the server, by sending a challenge again
 # This is to authenticate them both which afterwards we can send over the hash of the ticketInfo, to check if it's in the server's database of valid tickets
 # The server then sends back the state of the validity of the ticket which the venue then can use
 

@@ -1,4 +1,4 @@
-Protocol: RegistrationAndPayment
+Protocol: PaymentProtocol
 # This version leaks the ticket price
 Types:
     Agent A, S, mitID, b;
