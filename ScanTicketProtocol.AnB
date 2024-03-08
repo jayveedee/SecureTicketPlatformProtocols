@@ -1,0 +1,31 @@
+Protocol: ScanTicketProtocol
+
+Types:
+    Agent A,v,S;
+    Number NA, NV, NS, TicketInfo, TicketValidity, RequestTicket;
+    Function sk, pk, qrScan, hash
+
+Knowledge:
+    A: A, v, qrScan(v), pk(v), pk(A), inv(pk(A));
+    v: A, v, S, sk(v,S), hash, qrScan(v), inv(qrScan(v)), pk(v), inv(pk(v)), pk(S), pk(A);
+    S: A, v, S, sk(v,S), hash, pk(S), inv(pk(S)), pk(v);
+
+Actions:
+    v->A: A, v, NV                              # Challenge to authenticate A,v
+    A->v: {A, v, NA, NV}pk(v)                   # Challenge to authenticate A,v
+    v->A: {A, v, NA, NV, RequestTicket}pk(A)    # Challenge to authenticate A,v
+    A->v: {{A, v, NA, NV, {TicketInfo}qrScan(v)}inv(pk(A))}pk(v)            # Send ticket info over to venue
+    v->S: {|v, S, NV|}sk(v,S)                   # Challenge to authenticate S,v
+    S->v: {|v, S, NV, NS|}sk(v,S)               # Challenge to authenticate S,v
+    v->S: {|{v, S, NA, NV, NS, hash(TicketInfo)}inv(pk(v))|}sk(v,S)         # Verify ticket is valid by checking with server
+    S->v: {|{S, v, NA, NV, NS, TicketValidity}inv(pk(S))|}sk(v,S)           # Confirm the validity of the ticket with the venue
+
+Goals:
+    A authenticates v on NA,NV         #Works for strong auth
+    v authenticates A on NA,NV         #Works for strong auth
+    v authenticates S on NA,NV,NS      #Works for strong auth
+    S authenticates v on NA,NV,NS      #Works for strong auth
+
+    RequestTicket secret between A,v
+    TicketInfo secret between A,v
+    TicketValidity secret between v,S
