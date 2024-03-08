@@ -1,0 +1,31 @@
+Protocol: AuthenticationProtocol
+
+Types:
+    Agent A, S, mitID;
+    Number NA, NS;
+    Symmetric_key KAS;
+    Function sk, pk
+
+Knowledge: 
+    A: A, S, sk(A, mitID), mitID;
+    S: A, S, sk(S, mitID), mitID, pk(S), inv(pk(S));
+    mitID: A, S, sk(A, mitID), sk(S, mitID)
+    where A!=S
+
+# Share a symmetric key between the app and server via the help of mitID
+# as the identity provider. Assume that A!=S, which means that we require 
+# some way to ensure that the symmetric key is different per device for
+# our participants
+Actions:
+    S->A: A, S, NS
+    A->mitID: A, S, NA, NS
+    mitID->A: {|KAS, A, S, NS|}sk(S, mitID), 
+              {|KAS, A, S, NA|}sk(A, mitID)
+    A->S: {|KAS, A, S, NS|}sk(S, mitID), A, S
+    
+
+Goals:
+    A authenticates mitID on KAS,S
+    S authenticates mitID on KAS,A
+
+    KAS secret between A,S,mitID
