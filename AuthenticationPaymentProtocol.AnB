@@ -2,7 +2,7 @@ Protocol: AuthenticationPaymentProtocol
 # This version leaks the ticket price
 Types:
     Agent A, S, mitID, b;
-    Number NA, NS, TicketPaymentInfo, Ticket, CardInfoA, TicketToBuy, PaymentReceipt,ConfirmPayment,TicketPrice;
+    Number NA, NS, TicketPaymentInfo, Ticket, CardInfoA, AuthToken, PaymentReceipt,ConfirmPayment,TicketPrice;
     Symmetric_key KAS;
     Function sk, pk, creditCardInfo, pre
 
@@ -24,7 +24,7 @@ Actions:
     mitID->A: {|KAS, A, S, NS|}sk(S, mitID), 
               {|KAS, A, S, NA|}sk(A, mitID)
     A->S: {|KAS, A, S, NS|}sk(S, mitID), A, S
-    S->A: {|KAS, A, S, TicketToBuy|}KAS, A, S
+    S->A: {|KAS, A, S, AuthToken|}KAS, A, S
 #Payment
     # Payment to buy ticket supplied in th ticketpaymentinfo
     A->S: {|TicketPaymentInfo, {CardInfoA,A,TicketPrice}inv(creditCardInfo(A))|}KAS, A, S
@@ -41,7 +41,7 @@ Goals:
     S authenticates mitID on KAS,A
 
     KAS secret between A,S,mitID
-    TicketToBuy secret between A,S
+    AuthToken secret between A,S
     TicketPaymentInfo secret between A,S
     CardInfoA secret between A,b
     TicketPrice secret between A,b
